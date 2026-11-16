@@ -1,0 +1,12 @@
+id: library_demo
+route: library_demo
+description: 非 CEX 消费方的本地计算测试
+engine: plan
+enabled: true
+prompt: library_demo
+allowed_tools: [avg]
+execution:
+  max_steps: 4
+  max_model_calls: 6
+  max_tool_calls: 4
+  timeout_ms: 30000
