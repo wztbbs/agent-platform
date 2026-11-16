@@ -54,8 +54,8 @@ public interface AgentRunAdapter {
      * 提供该 Agent 的工具审批模式：默认逐调用确认，业务可显式选择整份方案审批。
      * 模式由服务端确定并随运行保存；恢复时校验一致，不能由模型入参降级。
      */
-    default com.cexpilot.platform.plan.ToolApprovalMode toolApprovalMode(ConversationAgent agent) {
-        return com.cexpilot.platform.plan.ToolApprovalMode.PER_CALL;
+    default com.cexpilot.platform.policy.approval.ToolApprovalMode toolApprovalMode(ConversationAgent agent) {
+        return com.cexpilot.platform.policy.approval.ToolApprovalMode.PER_CALL;
     }
 
     /**

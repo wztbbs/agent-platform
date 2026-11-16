@@ -1,5 +1,7 @@
 package com.cexpilot.platform.agent;
 
+import com.cexpilot.platform.context.prompt.PromptStore;
+
 import com.cexpilot.platform.execution.config.QueryExecutionConfig;
 import java.util.Set;
 
@@ -16,10 +18,10 @@ import java.util.Set;
  * @param toolApprovalMode 服务端选择逐调用确认或方案审批，默认 PER_CALL
  */
 public record ConfiguredAgentDefinition(AgentDefinition agent,boolean enabled,EngineKind engine,String prompt,Set<String> allowedTools,
-        int maxSteps,QueryExecutionConfig limits, com.cexpilot.platform.plan.ToolApprovalMode toolApprovalMode) {
+        int maxSteps,QueryExecutionConfig limits, com.cexpilot.platform.policy.approval.ToolApprovalMode toolApprovalMode) {
     public ConfiguredAgentDefinition(AgentDefinition agent, boolean enabled, EngineKind engine, String prompt, Set<String> allowedTools,
                                      int maxSteps, QueryExecutionConfig limits) {
-        this(agent, enabled, engine, prompt, allowedTools, maxSteps, limits, com.cexpilot.platform.plan.ToolApprovalMode.PER_CALL);
+        this(agent, enabled, engine, prompt, allowedTools, maxSteps, limits, com.cexpilot.platform.policy.approval.ToolApprovalMode.PER_CALL);
     }
     public ConfiguredAgentDefinition {
         if(prompt==null || !prompt.matches("[a-z][a-z0-9_-]{0,63}") || allowedTools==null || allowedTools.isEmpty()

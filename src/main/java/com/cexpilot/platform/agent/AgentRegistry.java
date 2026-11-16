@@ -1,6 +1,8 @@
 package com.cexpilot.platform.agent;
 
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.policy.agent.AgentAccessPolicy;
+
+import com.cexpilot.platform.context.prompt.PromptStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 
@@ -43,8 +45,8 @@ public class AgentRegistry {
         var ids = new HashSet<String>();
         for (var agent : agents) {
             var definition = agent.definition();
-            if (agent instanceof com.cexpilot.platform.engine.plan.PlanDrivenAgent driven)
-                com.cexpilot.platform.engine.plan.PlanHooksValidator.validate(driven.planHooks());
+            if (agent instanceof com.cexpilot.platform.execution.plan.PlanDrivenAgent driven)
+                com.cexpilot.platform.execution.plan.PlanHooksValidator.validate(driven.planHooks());
             if (!ids.add(definition.id()) || routes.putIfAbsent(definition.route(), agent) != null)
                 throw new IllegalStateException("重复 Agent id 或 route: " + definition);
         }
@@ -105,7 +107,9 @@ public class AgentRegistry {
      */
     public JsonNode enrichRoutingState(String visitor, JsonNode state) {
         JsonNode enriched = state == null ? null : state.deepCopy();
-        for (var agent : byRoute.values()) enriched = agent.enrichRoutingState(visitor, enriched);
+        for (var agent : byRoute.values()) {
+            enriched = agent.enrichRoutingState(visitor, enriched);
+        }
         return enriched;
     }
 

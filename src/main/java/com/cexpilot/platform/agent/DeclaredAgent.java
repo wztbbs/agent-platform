@@ -1,6 +1,9 @@
 package com.cexpilot.platform.agent;
 
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.execution.plan.PlanEngine;
+import com.cexpilot.platform.execution.react.ReactEngine;
+
+import com.cexpilot.platform.context.prompt.PromptStore;
 import com.cexpilot.platform.execution.ExecutionResult;
 import com.cexpilot.platform.tool.ToolRegistry;
 
@@ -44,7 +47,7 @@ public final class DeclaredAgent implements ToolBoundAgent {
      */
     @Override public String promptVersion() {
         var version = new StringBuilder(definition.agent().toString()).append(definition.engine()).append(definition.prompt()).append(definition.maxSteps());
-        if (definition.toolApprovalMode() == com.cexpilot.platform.plan.ToolApprovalMode.PREPARED_PLAN) {
+        if (definition.toolApprovalMode() == com.cexpilot.platform.policy.approval.ToolApprovalMode.PREPARED_PLAN) {
             version.append(":prepared-plan-v1");
         }
         switch (definition.engine()) {
@@ -57,8 +60,8 @@ public final class DeclaredAgent implements ToolBoundAgent {
         return PromptStore.fingerprint(version.toString());
     }
 
-    private String reactPrompt() { return definition.toolApprovalMode() == com.cexpilot.platform.plan.ToolApprovalMode.PREPARED_PLAN ? "react_base_prepare" : "react_base_decision"; }
-    private String planPrompt() { return definition.toolApprovalMode() == com.cexpilot.platform.plan.ToolApprovalMode.PREPARED_PLAN ? "plan_base_prepare" : "plan_agent"; }
+    private String reactPrompt() { return definition.toolApprovalMode() == com.cexpilot.platform.policy.approval.ToolApprovalMode.PREPARED_PLAN ? "react_base_prepare" : "react_base_decision"; }
+    private String planPrompt() { return definition.toolApprovalMode() == com.cexpilot.platform.policy.approval.ToolApprovalMode.PREPARED_PLAN ? "plan_base_prepare" : "plan_agent"; }
 
     @Override public ExecutionResult execute(AgentRunContext context) {
         throw new IllegalStateException("声明式 Agent 由底座引擎执行，不应直接调用 execute");

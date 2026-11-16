@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.cexpilot</groupId>
     <artifactId>agent-platform</artifactId>
-    <version>0.1.1</version>
+    <version>0.3.0</version>
     <name>Agent Platform</name>
     <description>公共 Agent 引擎、工具控制及持久化运行库；普通 JAR，不含 CEX 业务与启动入口。</description>
     <properties>

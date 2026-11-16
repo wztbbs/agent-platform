@@ -1,5 +1,8 @@
 package com.cexpilot.platform.run;
 
+import com.cexpilot.platform.policy.approval.PlanApprovalStatus;
+import com.cexpilot.platform.tool.execution.ToolCallStatus;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -69,7 +72,9 @@ public class DurableStore {
 
     public Entry require(Kind kind, String id) {
         var entry = find(kind, id);
-        if (entry == null) throw new IllegalArgumentException("执行记录不存在");
+        if (entry == null) {
+            throw new IllegalArgumentException("执行记录不存在");
+        }
         return entry;
     }
 

@@ -67,8 +67,8 @@ public class ToolRegistry {
     public AgentTool get(String name) { return tools.get(name); }
 
     /** 执行器仅供入口和类型检查使用；引擎实际执行统一走 invoke。 */
-    private org.springframework.beans.factory.ObjectProvider<com.cexpilot.platform.tool.control.ToolGateway> gateway;
-    @Autowired void gateway(org.springframework.beans.factory.ObjectProvider<com.cexpilot.platform.tool.control.ToolGateway> gateway) { this.gateway = gateway; }
+    private org.springframework.beans.factory.ObjectProvider<com.cexpilot.platform.tool.execution.ToolGateway> gateway;
+    @Autowired void gateway(org.springframework.beans.factory.ObjectProvider<com.cexpilot.platform.tool.execution.ToolGateway> gateway) { this.gateway = gateway; }
     public ToolDefinition definition(String name) {
         var definition = definitions.get(name);
         if (definition == null) throw new IllegalArgumentException("工具未注册或已禁用: " + name);

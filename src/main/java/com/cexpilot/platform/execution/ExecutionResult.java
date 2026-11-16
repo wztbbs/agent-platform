@@ -86,14 +86,14 @@ public record ExecutionResult(String answer,
     /**
      * 标记实际执行的 Agent 及其业务载荷。
      *
-     * @param type    实际执行的对外路由标识
+     * @param route   实际执行的对外路由标识，写入 agentType
      * @param payload Agent 私有载荷（如交接结果、stop_reason）；可为 null
      * @return 替换 agentType/agentPayload 后的副本
      */
-    public ExecutionResult withAgent(String type,JsonNode payload) {
+    public ExecutionResult withAgentRouteAndPayload(String route, JsonNode payload) {
         return new ExecutionResult(answer,evidence,toolCallCount,steps,promptTokens,completionTokens,turnStatus,clarify,
                 reusedFactCount,plannerLlmCalls,answerLlmCalls,metricFetchCount,calculationCount,httpRequestCount,
-                savedFactIds,output,llmUsages,routerLlmCalls,type,payload);
+                savedFactIds,output,llmUsages,routerLlmCalls,route,payload);
     }
 
     /**
@@ -103,10 +103,13 @@ public record ExecutionResult(String answer,
      * @param routing Router 阶段的 LLM 用量列表
      * @return 合并后的副本
      */
-    public ExecutionResult withRouterUsages(List<com.cexpilot.platform.llm.LlmUsage> routing) {
+    public ExecutionResult mergeRouterUsage(List<com.cexpilot.platform.llm.LlmUsage> routing) {
         var combined=new java.util.ArrayList<>(routing);
-        if(llmUsages!=null) combined.addAll(llmUsages);
-        else if(plannerLlmCalls+answerLlmCalls>0) combined.add(new com.cexpilot.platform.llm.LlmUsage("unknown",null,null,null,null));
+        if (llmUsages != null) {
+            combined.addAll(llmUsages);
+        } else if (plannerLlmCalls + answerLlmCalls > 0) {
+            combined.add(new com.cexpilot.platform.llm.LlmUsage("unknown", null, null, null, null));
+        }
         return new ExecutionResult(answer,evidence,toolCallCount,steps,
                 promptTokens+com.cexpilot.platform.llm.LlmUsage.knownPromptTokens(routing),
                 completionTokens+com.cexpilot.platform.llm.LlmUsage.knownCompletionTokens(routing),turnStatus,clarify,reusedFactCount,

@@ -1,6 +1,6 @@
 package com.cexpilot.platform.execution.config;
 
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.context.prompt.PromptStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,10 +36,15 @@ public class HarnessRolloutConfig {
     /** 启动时校验：百分比在 0~100，cohortSalt 为合法标识。 */
     @jakarta.annotation.PostConstruct
     public void validate() {
-        for (int percent : new int[]{adaptiveQueryPercent, httpAgentsPercent, handoffPercent})
-            if (percent < 0 || percent > 100) throw new IllegalArgumentException("harness.rollout 百分比必须在 0～100");
-        if (cohortSalt == null || !cohortSalt.matches("[A-Za-z0-9_-]{1,64}"))
+        for (int percent : new int[]{adaptiveQueryPercent, httpAgentsPercent, handoffPercent}) {
+            if (percent < 0 || percent > 100) {
+                throw new IllegalArgumentException("harness.rollout 百分比必须在 0～100");
+            }
+        }
+        if (cohortSalt == null || !cohortSalt.matches("[A-Za-z0-9_-]{1,64}")) {
             throw new IllegalArgumentException("非法 harness.rollout.cohort-salt");
+        }
+
     }
 
     /**

@@ -36,7 +36,7 @@ public record ToolDefinition(String name, boolean enabled, String description, J
     }
 
     public String contractVersion() {
-        return com.cexpilot.platform.prompt.PromptStore.fingerprint(description+":"+inputSchema+":"+outputSchema+":"+http+":"+control);
+        return com.cexpilot.platform.context.prompt.PromptStore.fingerprint(description+":"+inputSchema+":"+outputSchema+":"+http+":"+control);
     }
     /** @return 暴露给模型的工具规格（名称、描述、输入 schema 的深拷贝） */
     public ToolSpec spec() {

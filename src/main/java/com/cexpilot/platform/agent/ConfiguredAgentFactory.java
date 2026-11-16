@@ -1,6 +1,8 @@
 package com.cexpilot.platform.agent;
 
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.policy.agent.AgentRegistrationPolicy;
+
+import com.cexpilot.platform.context.prompt.PromptStore;
 import com.cexpilot.platform.tool.ToolRegistry;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;

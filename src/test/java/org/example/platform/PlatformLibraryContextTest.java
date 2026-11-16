@@ -2,7 +2,7 @@ package org.example.platform;
 
 import com.cexpilot.platform.agent.*;
 import com.cexpilot.platform.configuration.PlatformConfiguration;
-import com.cexpilot.platform.evidence.ToolEvidenceWriter;
+import com.cexpilot.platform.context.evidence.ToolEvidenceWriter;
 import com.cexpilot.platform.execution.RequestContext;
 import com.cexpilot.platform.llm.*;
 import com.cexpilot.platform.observability.TraceSink;
@@ -34,8 +34,6 @@ class PlatformLibraryContextTest {
     @EnableAutoConfiguration
     @Import(PlatformConfiguration.class)
     static class HostApplication {
-        @Bean Clock clock() { return Clock.systemUTC(); }
-        @Bean TraceSink traces() { return event -> {}; }
         @Bean ToolEvidenceWriter evidence() { return (conversation, turn, trace, agent, tool, data, provenance, now) -> Optional.empty(); }
         @Bean(LlmClient.NORMAL_LLM_CLIENT)
         LlmClient model() {
@@ -47,15 +45,17 @@ class PlatformLibraryContextTest {
         }
     }
 
-    @Autowired AgentDispatcher dispatcher;
+    @Autowired AgentExecutionService execution;
     @Autowired AgentRegistry agents;
     @Autowired ToolRegistry tools;
     @Autowired JdbcTemplate jdbc;
     @Autowired ResourceLoader resources;
 
     @Test void nonCexHostRunsRegisteredPlanThroughSharedRuntime() {
-        var result = dispatcher.execute(AgentExecutionRequest.builder("求1和3的平均值", "library-trace", event -> {})
-                .requestContext(new RequestContext(ZoneOffset.UTC, Instant.now())).visitor("library-user").build());
+        var response = execution.execute(new AgentExecutionRequest("求1和3的平均值", null, "library-user", ZoneOffset.UTC, null));
+        var result = response.result();
+        assertEquals("SUCCESS", jdbc.queryForObject("SELECT status FROM ask_trace WHERE trace_id=?", String.class, response.traceId()));
+        assertEquals(3, jdbc.queryForObject("SELECT COUNT(*) FROM trace_event WHERE trace_id=? AND event_type='LLM_CALL'", Integer.class, response.traceId()));
         assertEquals("library_demo", result.agentType());
         assertEquals("平均值为2", result.answer());
         assertEquals(1, result.toolCallCount());

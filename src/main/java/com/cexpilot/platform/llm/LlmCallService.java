@@ -1,7 +1,7 @@
 package com.cexpilot.platform.llm;
 
 import com.cexpilot.platform.execution.QueryBudget;
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.context.prompt.PromptStore;
 import com.cexpilot.platform.observability.TraceEvent;
 import com.cexpilot.platform.observability.TraceSink;
 import com.fasterxml.jackson.databind.ObjectMapper;

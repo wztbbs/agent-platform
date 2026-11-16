@@ -1,4 +1,4 @@
 package com.cexpilot.platform.agent;
 
-/** 应用提供的类型化输入。底座只传递，由目标 Agent 的适配器解释。 */
+/** 会话端口装配后的内部类型化输入，供上下文投影与 Agent 适配器解释；公共请求传 BusinessInput。 */
 public interface AgentInput {}

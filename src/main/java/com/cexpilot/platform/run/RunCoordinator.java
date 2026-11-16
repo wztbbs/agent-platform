@@ -1,10 +1,10 @@
 package com.cexpilot.platform.run;
 
 import com.cexpilot.platform.agent.*;
-import com.cexpilot.platform.plan.*;
+import com.cexpilot.platform.policy.approval.*;
 import com.cexpilot.platform.execution.*;
 import com.cexpilot.platform.execution.config.QueryExecutionConfig;
-import com.cexpilot.platform.evidence.EvidenceSession;
+import com.cexpilot.platform.context.evidence.EvidenceSession;
 import com.cexpilot.platform.observability.TraceSink;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,11 +54,13 @@ public class RunCoordinator {
     }
 
     public ExecutionResult execute(ConversationAgent agent, AgentRunContext context) {
-        if (context.visitor() == null || !context.visitor().matches("[A-Za-z0-9_-]{1,64}"))
+        if (context.visitor() == null || !context.visitor().matches("[A-Za-z0-9_-]{1,64}")) {
             throw new SecurityException("可恢复运行需要可信用户身份");
+        }
         var registered = agents.requireAllowed(agent.definition().route(), context.visitor());
-        if (!registered.definition().id().equals(agent.definition().id()))
+        if (!registered.definition().id().equals(agent.definition().id())) {
             throw new SecurityException("Agent 注册身份不一致");
+        }
         var adapter = adapters.find(registered).orElseThrow(() -> new IllegalArgumentException("Agent 没有持久化运行适配器"));
         if (adapter.toolApprovalMode(registered) == ToolApprovalMode.PREPARED_PLAN && plans == null) {
             throw new IllegalStateException("方案审批服务未装配");
@@ -197,14 +199,14 @@ public class RunCoordinator {
                     usages == null ? 0 : com.cexpilot.platform.llm.LlmUsage.knownCompletionTokens(usages), "FAILED", null, c.reusedFactCount(),
                     c.plannerLlmCalls(), c.answerLlmCalls(), c.metricFetchCount(), c.calculationCount(), c.httpRequestCount(), c.savedFactIds()).withLlmUsages(usages).withOutput(counted.output);
         } else
-            failed = new ExecutionResult("本次运行未完成，请查看执行记录。", json.createArrayNode(), 0, 0, 0, 0, "FAILED", null);
-        complete(entry, failed.withAgent(entry.data().path("route").asText(), payload), RunStatus.FAILED, adapter);
+            { failed = new ExecutionResult("本次运行未完成，请查看执行记录。", json.createArrayNode(), 0, 0, 0, 0, "FAILED", null); }
+        complete(entry, failed.withAgentRouteAndPayload(entry.data().path("route").asText(), payload), RunStatus.FAILED, adapter);
     }
 
     private void complete(DurableStore.Entry claimed, ExecutionResult result, RunStatus status, AgentRunAdapter adapter) {
         var entry = store.require(RUN, claimed.id());
         if (entry.fence() != claimed.fence() || entry.leaseUntil() == null || !entry.leaseUntil().isAfter(clock.instant()))
-            return;
+            { return; }
         var calls = store.calls(entry.id());
         result = result.withToolCounts(Math.max(result.toolCallCount(), calls.size()), Math.max(result.httpRequestCount(), calls.stream().mapToInt(call -> call.data().path("httpRequests").asInt()).sum()));
         var data = entry.data();
@@ -212,7 +214,7 @@ public class RunCoordinator {
         payload.put("runId", entry.id());
         data.set("privateOutput", adapter == null ? json.nullNode() : adapter.captureOutput(result.output()));
         // 公共结果不携带任意业务接口类型；私有结果只能由原适配器显式恢复。
-        data.set("result", json.valueToTree(result.withOutput(null).withAgent(entry.data().path("route").asText(), payload)));
+        data.set("result", json.valueToTree(result.withOutput(null).withAgentRouteAndPayload(entry.data().path("route").asText(), payload)));
         data.put("completedAt", clock.instant().toString());
         store.update(RUN, entry, status.name(), clock.instant(), null, data);
     }
@@ -319,6 +321,6 @@ public class RunCoordinator {
         var payload = view(entry.id(), entry.owner());
         payload.put("execution_status", "WAITING");
         return new ExecutionResult("任务仍在执行，可在此查看进度并处理所需确认。", json.createArrayNode(), 0, 0, 0, 0, "WAITING", null)
-                .withAgent(entry.data().path("route").asText(), payload);
+                .withAgentRouteAndPayload(entry.data().path("route").asText(), payload);
     }
 }

@@ -1,5 +1,7 @@
 package com.cexpilot.platform.agent;
 
+import com.cexpilot.platform.execution.react.ReactEngine;
+
 import com.cexpilot.platform.execution.config.QueryExecutionConfig;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
@@ -55,11 +57,11 @@ public final class AgentDefinitionLoader {
     private static String text(Map<?,?> map,String key){if(map.get(key) instanceof String text && !text.isBlank())return text;throw new IllegalArgumentException("缺少 "+key);}
     /** 取整数字段，缺省时返回 fallback；类型不是整数抛 IllegalArgumentException。 */
     private static int number(Map<?,?> map,String key,int fallback){if(!map.containsKey(key))return fallback;if(map.get(key) instanceof Integer number)return number;throw new IllegalArgumentException(key+" 必须为整数");}
-    private static com.cexpilot.platform.plan.ToolApprovalMode approvalMode(Map<?,?> doc) {
-        if (!doc.containsKey("tool_approval")) return com.cexpilot.platform.plan.ToolApprovalMode.PER_CALL;
+    private static com.cexpilot.platform.policy.approval.ToolApprovalMode approvalMode(Map<?,?> doc) {
+        if (!doc.containsKey("tool_approval")) return com.cexpilot.platform.policy.approval.ToolApprovalMode.PER_CALL;
         return switch (text(doc,"tool_approval")) {
-            case "per_call" -> com.cexpilot.platform.plan.ToolApprovalMode.PER_CALL;
-            case "prepared_plan" -> com.cexpilot.platform.plan.ToolApprovalMode.PREPARED_PLAN;
+            case "per_call" -> com.cexpilot.platform.policy.approval.ToolApprovalMode.PER_CALL;
+            case "prepared_plan" -> com.cexpilot.platform.policy.approval.ToolApprovalMode.PREPARED_PLAN;
             default -> throw new IllegalArgumentException("tool_approval 仅支持 per_call/prepared_plan");
         };
     }

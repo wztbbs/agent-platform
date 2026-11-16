@@ -1,7 +1,7 @@
 package com.cexpilot.platform.llm;
 
 import com.cexpilot.platform.observability.TraceSink;
-import com.cexpilot.platform.prompt.PromptStore;
+import com.cexpilot.platform.context.prompt.PromptStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import java.util.ArrayList;

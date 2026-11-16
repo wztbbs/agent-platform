@@ -1,8 +1,8 @@
 package com.cexpilot.platform.run;
 
 import com.cexpilot.platform.agent.*;
-import com.cexpilot.platform.engine.react.ReactEngine;
-import com.cexpilot.platform.engine.plan.PlanEngine;
+import com.cexpilot.platform.execution.react.ReactEngine;
+import com.cexpilot.platform.execution.plan.PlanEngine;
 import com.cexpilot.platform.execution.config.QueryExecutionConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
@@ -18,7 +18,7 @@ public final class DeclaredAgentRunAdapter implements AgentRunAdapter {
     public String version() { return "decision-journal-v1"; }
     public boolean supports(ConversationAgent agent) { return agent instanceof DeclaredAgent; }
     public QueryExecutionConfig limits(ConversationAgent agent) { return ((DeclaredAgent) agent).configured().limits(); }
-    public com.cexpilot.platform.plan.ToolApprovalMode toolApprovalMode(ConversationAgent agent) { return ((DeclaredAgent) agent).configured().toolApprovalMode(); }
+    public com.cexpilot.platform.policy.approval.ToolApprovalMode toolApprovalMode(ConversationAgent agent) { return ((DeclaredAgent) agent).configured().toolApprovalMode(); }
     public JsonNode captureInput(ConversationAgent agent, AgentRunContext context) {
         if (context.privateInput() != null) throw new IllegalArgumentException("声明式 Agent 不接收业务私有输入");
         return NullNode.instance;

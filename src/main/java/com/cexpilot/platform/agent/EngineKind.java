@@ -1,5 +1,9 @@
 package com.cexpilot.platform.agent;
 
+import com.cexpilot.platform.execution.plan.PlanEngine;
+import com.cexpilot.platform.execution.plan.PlanHooks;
+import com.cexpilot.platform.execution.react.ReactEngine;
+
 /**
  * Agent 的执行引擎类型。底座按该声明把执行分发给对应引擎，业务 Agent 只提供声明与回调。
  */

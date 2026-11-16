@@ -17,6 +17,11 @@ def main():
     if not jar.is_file():
         raise SystemExit("请先执行 mvn package -DskipTests")
     entries = {name + ".jar": jar.read_bytes(), name + ".pom": pom.read_bytes()}
+    # 升级 SQL 随制品发放，宿主显式执行；不依赖获取底座源码。
+    for sql in sorted((ROOT / "src/main/resources/platform/db").rglob("*.sql")):
+        entries[sql.relative_to(ROOT / "src/main/resources").as_posix()] = sql.read_bytes()
+    entries["执行入口与Trace.md"] = (ROOT / "docs/执行入口与Trace.md").read_bytes()
+    entries["包结构与迁移.md"] = (ROOT / "docs/包结构与迁移.md").read_bytes()
     checksums = "".join(hashlib.sha256(data).hexdigest() + "  " + filename + "\n" for filename, data in entries.items())
     bundle = ROOT / "target" / (name + "-release.zip")
     with zipfile.ZipFile(bundle, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -25,7 +30,7 @@ def main():
         archive.writestr("SHA256SUMS", checksums)
         archive.writestr("INSTALL.txt", "先执行 sha256sum -c SHA256SUMS，再执行：\n"
                          + "mvn install:install-file -Dfile=" + name + ".jar -DpomFile=" + name + ".pom\n"
-                         + "安装用户须与构建宿主业务应用的用户一致。本包不含凭证，也不改变数据库。\n")
+                         + "安装用户须与构建宿主业务应用的用户一致。本包不含凭证，不自动改变数据库。\n升级 0.2.0 的存量库需先检查并执行 platform/db/migrations/002_trace_request_context.sql；新库只执行 platform/db/schema.sql。\n")
     print(bundle)
 
 

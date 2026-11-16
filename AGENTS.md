@@ -7,3 +7,6 @@
 - 测试使用脚本模型、H2 或本地模拟服务，不擅自调用真实模型、交易所或线上业务。
 - 不在库中加入 application.yml、客户业务 Agent／工具、凭证、业务表或启动主类。
 - 发布新版本时更新 pom.xml；不得覆盖已发布版本。宿主应用自行选择升级时间。
+
+- 对外执行使用 AgentExecutionService／AgentExecutionRequest；AgentDispatchRequest 只供底座内部装配，不要求宿主拼装 TraceSink、history 或内部上下文。
+- Trace 生命周期、存储和 ask_trace／trace_event DDL 归底座；宿主的会话、业务反馈和展示留在业务工程。DDL 变更同时更新完整 schema 与显式升级脚本，不能靠 CREATE IF NOT EXISTS 补列。

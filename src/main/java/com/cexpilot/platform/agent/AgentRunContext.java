@@ -1,6 +1,6 @@
 package com.cexpilot.platform.agent;
 
-import com.cexpilot.platform.evidence.EvidenceSession;
+import com.cexpilot.platform.context.evidence.EvidenceSession;
 import com.cexpilot.platform.execution.RequestContext;
 import com.cexpilot.platform.observability.TraceSink;
 import com.fasterxml.jackson.databind.JsonNode;

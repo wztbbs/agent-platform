@@ -1,6 +1,6 @@
 package com.cexpilot.platform.run;
 
-import com.cexpilot.platform.tool.control.ToolGateway;
+import com.cexpilot.platform.tool.execution.ToolGateway;
 import jakarta.annotation.PreDestroy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,13 +13,13 @@ import java.util.concurrent.*;
 public class RunReconciler implements AutoCloseable {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RunReconciler.class);
     private final DurableStore store; private final ToolGateway tools; private final RunCoordinator runs; private final Clock clock;
-    private final com.cexpilot.platform.plan.PreparedPlanService plans;
+    private final com.cexpilot.platform.policy.approval.PreparedPlanService plans;
     private final Set<String> local=ConcurrentHashMap.newKeySet();
     private final ThreadPoolExecutor workers=new ThreadPoolExecutor(4,4,30,TimeUnit.SECONDS,new ArrayBlockingQueue<>(32),
             r->{var thread=new Thread(r,"platform-resume");thread.setDaemon(true);return thread;},new ThreadPoolExecutor.AbortPolicy());
     public RunReconciler(DurableStore store,ToolGateway tools,RunCoordinator runs,Clock clock) {this(store,tools,runs,clock,null);}
     @org.springframework.beans.factory.annotation.Autowired
-    public RunReconciler(DurableStore store,ToolGateway tools,RunCoordinator runs,Clock clock,com.cexpilot.platform.plan.PreparedPlanService plans) {
+    public RunReconciler(DurableStore store,ToolGateway tools,RunCoordinator runs,Clock clock,com.cexpilot.platform.policy.approval.PreparedPlanService plans) {
         this.store=store;this.tools=tools;this.runs=runs;this.clock=clock;this.plans=plans;
     }
     /** 扫描入口只处理调度失败；工作线程的异常由 reconcile 收口。 */

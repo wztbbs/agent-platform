@@ -50,11 +50,15 @@ public record TurnCounters(int plannerLlmCalls, int answerLlmCalls, int metricFe
     /**
      * 合并 Router 用量：routing 追加到 llmUsages 前部，routerLlmCalls 记为路由调用次数；
      * 原用量缺失但计数非零时补一条 unknown 占位。
+     * 返回新的计数副本，原计数保持不变。
      */
-    public TurnCounters withRouterUsages(List<LlmUsage> routing) {
+    public TurnCounters mergeRouterUsage(List<LlmUsage> routing) {
         var combined=new ArrayList<>(routing);
-        if(llmUsages!=null) combined.addAll(llmUsages);
-        else if(plannerLlmCalls+answerLlmCalls>0) combined.add(new LlmUsage("unknown",null,null,null,null));
+        if (llmUsages != null) {
+            combined.addAll(llmUsages);
+        } else if (plannerLlmCalls + answerLlmCalls > 0) {
+            combined.add(new LlmUsage("unknown", null, null, null, null));
+        }
         return new TurnCounters(plannerLlmCalls,answerLlmCalls,metricFetchCount,calculationCount,httpRequestCount,
                 reusedFactCount,savedFactIds,combined,routing.size(),toolCallCount);
     }

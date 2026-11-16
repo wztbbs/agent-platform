@@ -23,9 +23,9 @@ public final class ExecutionFailure extends RuntimeException {
         this.evidence = evidence == null ? null : evidence.deepCopy();
     }
 
-    /** 编排边界只补充路由用量，保留原始原因以及收尾失败的 suppressed 异常。 */
-    public ExecutionFailure withRouterUsages(java.util.List<com.cexpilot.platform.llm.LlmUsage> usages) {
-        var enriched = new ExecutionFailure(getCause(), counters.withRouterUsages(usages), output, evidence);
+    /** 返回合并路由用量后的异常副本，保留原始原因以及收尾失败的 suppressed 异常。 */
+    public ExecutionFailure mergeRouterUsage(java.util.List<com.cexpilot.platform.llm.LlmUsage> usages) {
+        var enriched = new ExecutionFailure(getCause(), counters.mergeRouterUsage(usages), output, evidence);
         for (var secondary : getSuppressed()) enriched.addSuppressed(secondary);
         return enriched;
     }
